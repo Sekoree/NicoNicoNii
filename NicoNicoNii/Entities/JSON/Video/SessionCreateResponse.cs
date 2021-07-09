@@ -51,7 +51,7 @@ namespace NicoNicoNii.Entities.JSON.Video
             public long? PlaySeekTime { get; set; }
 
             [JsonPropertyName("play_speed")]
-            public long? PlaySpeed { get; set; }
+            public double? PlaySpeed { get; set; }
 
             [JsonPropertyName("play_control_range")]
             public PlayControlRange PlayControlRange { get; set; }
@@ -180,10 +180,10 @@ namespace NicoNicoNii.Entities.JSON.Video
         public partial class PlayControlRange
         {
             [JsonPropertyName("max_play_speed")]
-            public long? MaxPlaySpeed { get; set; }
+            public double? MaxPlaySpeed { get; set; }
 
             [JsonPropertyName("min_play_speed")]
-            public long? MinPlaySpeed { get; set; }
+            public double? MinPlaySpeed { get; set; }
         }
 
         public partial class Protocol

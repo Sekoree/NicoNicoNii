@@ -1,8 +1,10 @@
 ﻿using AngleSharp;
 using NicoNicoNii.Entities.JSON;
+using NicoNicoNii.Entities.JSON.Video;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -33,6 +35,25 @@ namespace NicoNicoNii
             var json = HttpUtility.HtmlDecode(elm);
             var data = JsonSerializer.Deserialize<WatchPageData>(json);
             return data;
+        }
+
+        public async Task<SessionCreateResponse> GetVideoApiResponseAsync(WatchPageData watchPageData, string[] audioQualities = null, string[] videoQualities = null)
+        {
+            if (videoQualities == null)
+                videoQualities = watchPageData.Media.Delivery.Movie.Session.Videos.ToArray();
+            if (audioQualities == null)
+                audioQualities = watchPageData.Media.Delivery.Movie.Session.Audios.ToArray();
+
+            var json = JsonSerializer.Serialize(new SessionCreate(watchPageData, audioQualities, videoQualities));
+            using (var content = new StringContent(json, Encoding.UTF8, "application/json"))
+            using (var msg = new HttpRequestMessage(HttpMethod.Post, $"{watchPageData.Media.Delivery.Movie.Session.Urls[0].UrlUrl}?_format=json"))
+            {
+                msg.Content = content;
+                var response = await this._nndClient._client.SendAsync(msg);
+                var responseJson = await response.Content.ReadAsStringAsync();
+                var sessionResponse = JsonSerializer.Deserialize<SessionCreateResponse>(responseJson);
+                return sessionResponse;
+            }
         }
     }
 }

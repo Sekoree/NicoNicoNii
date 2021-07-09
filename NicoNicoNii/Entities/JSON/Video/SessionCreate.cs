@@ -8,8 +8,62 @@ using System.Threading.Tasks;
 namespace NicoNicoNii.Entities.JSON.Video
 {
     //POST
+    //https://api.dmc.nico/api/sessions?_format=json
+    //HTTP Protocol
     public class SessionCreate
     {
+        public SessionCreate(WatchPageData watchPage, string[] audioQuality, string[] videoQuality)
+        {
+            this.Session.RecipeId = watchPage.Media.Delivery.RecipeId;
+            this.Session.ContentId = watchPage.Media.Delivery.Movie.ContentId;
+            this.Session.ContentType = "movie";
+
+            this.Session.ContentSrcIdSets = new[]
+            {
+                new ContentSrcIdSet
+                {
+                    ContentSrcIds = new[]
+                    {
+                        new ContentSrcId()
+                        {
+                            SrcIdToMux = new SrcIdToMux
+                            {
+                                AudioSrcIds = audioQuality,
+                                VideoSrcIds = videoQuality
+                            }
+                        }
+                    }
+                }
+            };
+
+            this.Session.TimingConstraint = "unlimited";
+
+            this.Session.KeepMethod.Heartbeat.Lifetime = watchPage.Media.Delivery.Movie.Session.HeartbeatLifetime;
+
+            this.Session.Protocol.Name = watchPage.Media.Delivery.Movie.Session.Protocols[0];
+            this.Session.Protocol.Parameters.HttpParameters.Parameters.HttpOutputDownloadParameters.UseWellKnownPort = 
+                watchPage.Media.Delivery.Movie.Session.Urls[0].IsWellKnownPort == true ? "yes" : "no";
+
+            this.Session.Protocol.Parameters.HttpParameters.Parameters.HttpOutputDownloadParameters.UseSsl =
+                watchPage.Media.Delivery.Movie.Session.Urls[0].IsSsl== true ? "yes" : "no";
+
+            this.Session.Protocol.Parameters.HttpParameters.Parameters.HttpOutputDownloadParameters.TransferPreset =
+                "standard2";
+
+            this.Session.ContentUri = "";
+
+            this.Session.SessionOperationAuth.SessionOperationAuthBySignature.Token = watchPage.Media.Delivery.Movie.Session.Token;
+            this.Session.SessionOperationAuth.SessionOperationAuthBySignature.Signature = watchPage.Media.Delivery.Movie.Session.Signature;
+
+            this.Session.ContentAuth.AuthType = "ht2";
+            this.Session.ContentAuth.ContentKeyTimeout = watchPage.Media.Delivery.Movie.Session.ContentKeyTimeout;
+            this.Session.ContentAuth.ServiceId = "nicovideo";
+            this.Session.ContentAuth.ServiceUserId = watchPage.Media.Delivery.Movie.Session.ServiceUserId;
+
+            this.Session.ClientInfo.PlayerId = watchPage.Media.Delivery.Movie.Session.PlayerId;
+            this.Session.Priority = 0.8;
+        }
+
         [JsonPropertyName("session")]
         public SessionClass Session { get; set; } = new();
 
@@ -25,7 +79,7 @@ namespace NicoNicoNii.Entities.JSON.Video
             public string ContentType { get; set; }
 
             [JsonPropertyName("content_src_id_sets")]
-            public List<ContentSrcIdSet> ContentSrcIdSets { get; set; } = new();
+            public ContentSrcIdSet[] ContentSrcIdSets { get; set; }
 
             [JsonPropertyName("timing_constraint")]
             public string TimingConstraint { get; set; }
@@ -76,7 +130,7 @@ namespace NicoNicoNii.Entities.JSON.Video
         public partial class ContentSrcIdSet
         {
             [JsonPropertyName("content_src_ids")]
-            public List<ContentSrcId> ContentSrcIds { get; set; } = new();
+            public ContentSrcId[] ContentSrcIds { get; set; }
         }
 
         public partial class ContentSrcId
@@ -88,10 +142,10 @@ namespace NicoNicoNii.Entities.JSON.Video
         public partial class SrcIdToMux
         {
             [JsonPropertyName("video_src_ids")]
-            public List<string> VideoSrcIds { get; set; } = new();
+            public IEnumerable<string> VideoSrcIds { get; set; }
 
             [JsonPropertyName("audio_src_ids")]
-            public List<string> AudioSrcIds { get; set; } = new();
+            public IEnumerable<string> AudioSrcIds { get; set; }
         }
 
         public partial class KeepMethod

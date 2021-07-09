@@ -5,7 +5,7 @@ using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
-namespace NicoNicoNii.Entities.JSON
+namespace NicoNicoNii.Entities.JSON.Video
 {
     public class WatchPageData
     {
@@ -732,7 +732,7 @@ namespace NicoNicoNii.Entities.JSON
             public string Type { get; set; }
 
             [JsonPropertyName("positionSec")]
-            public long? PositionSec { get; set; }
+            public double? PositionSec { get; set; }
         }
 
         public partial class RankingClass

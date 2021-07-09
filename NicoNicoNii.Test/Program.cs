@@ -13,7 +13,8 @@ namespace NicoNicoNii.Test
             var sess = await nnd.CheckSessionValidityAsync();
             Console.WriteLine("Is session valid? " + sess);
             var vidClient = new NicoVideoClient(nnd);
-            await vidClient.GetWatchPageInfoAsync("sm29442394");
+            var watch = await vidClient.GetWatchPageInfoAsync("sm29442394");
+            var sessVid = await vidClient.GetVideoApiResponseAsync(watch);
         }
     }
 }
