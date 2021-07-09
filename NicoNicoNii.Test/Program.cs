@@ -9,12 +9,13 @@ namespace NicoNicoNii.Test
         {
             Console.WriteLine("Hello World!");
             var nnd = new NNDClient();
-            //await nnd.LoginAsync("MAILTEL", "PW");
+            await nnd.LoginAsync("AAAAA", "AAAA");
             var sess = await nnd.CheckSessionValidityAsync();
             Console.WriteLine("Is session valid? " + sess);
             var vidClient = new NicoVideoClient(nnd);
             var watch = await vidClient.GetWatchPageInfoAsync("sm29442394");
-            var sessVid = await vidClient.GetVideoApiResponseAsync(watch);
+            var sessVid = await vidClient.GetHLSVideoApiResponseAsync(watch);
+            var sessVid2 = await vidClient.GetHTTPVideoApiResponseAsync(watch);
         }
     }
 }

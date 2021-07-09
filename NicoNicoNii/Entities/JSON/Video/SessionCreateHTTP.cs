@@ -10,9 +10,9 @@ namespace NicoNicoNii.Entities.JSON.Video
     //POST
     //https://api.dmc.nico/api/sessions?_format=json
     //HTTP Protocol
-    public class SessionCreate
+    public class SessionCreateHTTP
     {
-        public SessionCreate(WatchPageData watchPage, string[] audioQuality, string[] videoQuality)
+        public SessionCreateHTTP(WatchPageData watchPage, string[] audioQuality, string[] videoQuality)
         {
             this.Session.RecipeId = watchPage.Media.Delivery.RecipeId;
             this.Session.ContentId = watchPage.Media.Delivery.Movie.ContentId;
@@ -48,7 +48,7 @@ namespace NicoNicoNii.Entities.JSON.Video
                 watchPage.Media.Delivery.Movie.Session.Urls[0].IsSsl== true ? "yes" : "no";
 
             this.Session.Protocol.Parameters.HttpParameters.Parameters.HttpOutputDownloadParameters.TransferPreset =
-                "standard2";
+                "";
 
             this.Session.ContentUri = "";
 
