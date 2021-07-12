@@ -12,7 +12,7 @@ namespace NicoNicoNii.Entities.JSON.Video
     //HTTP Protocol
     public class SessionCreateHTTP
     {
-        public SessionCreateHTTP(WatchPageData watchPage, string[] audioQuality, string[] videoQuality)
+        public SessionCreateHTTP(WatchPageData watchPage, string[] audioQuality, string[] videoQuality, bool loggedIn)
         {
             this.Session.RecipeId = watchPage.Media.Delivery.RecipeId;
             this.Session.ContentId = watchPage.Media.Delivery.Movie.ContentId;
@@ -61,7 +61,7 @@ namespace NicoNicoNii.Entities.JSON.Video
             this.Session.ContentAuth.ServiceUserId = watchPage.Media.Delivery.Movie.Session.ServiceUserId;
 
             this.Session.ClientInfo.PlayerId = watchPage.Media.Delivery.Movie.Session.PlayerId;
-            this.Session.Priority = 0.8;
+            this.Session.Priority = loggedIn ? 0.8 : 0;
         }
 
         [JsonPropertyName("session")]

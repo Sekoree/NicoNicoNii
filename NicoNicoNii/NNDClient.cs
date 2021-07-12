@@ -14,8 +14,10 @@ namespace NicoNicoNii
     {
         internal readonly HttpClient _client;
         internal readonly HttpClientHandler _handler;
+        internal DateTimeOffset? _loginDate { get; set; }
 
         public LoginSessionData LoginSessionData { get; internal set; }
+        
 
         public NNDClient()
         {
@@ -48,6 +50,7 @@ namespace NicoNicoNii
                 var loginData = serializer.Deserialize(await response.Content.ReadAsStreamAsync()) as LoginSessionData;
                 this.LoginSessionData = loginData;
                 this._handler.CookieContainer.Add(new Uri("http://api.ce.nicovideo.jp"), new Cookie("user_session", this.LoginSessionData.SessionKey, "/", "nicovideo.jp"));
+                this._loginDate = DateTimeOffset.UtcNow;
                 return loginData;
             }
         }
@@ -67,6 +70,7 @@ namespace NicoNicoNii
         public async Task<bool> LogoutAsync()
         {
             var responseMessage = await this._client.GetAsync("https://account.nicovideo.jp/logout", HttpCompletionOption.ResponseHeadersRead);
+            this._loginDate = null;
             return responseMessage.IsSuccessStatusCode;
         }
     }
