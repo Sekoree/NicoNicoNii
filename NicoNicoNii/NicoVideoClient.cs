@@ -50,16 +50,14 @@ namespace NicoNicoNii
         public async Task InitializeNonMemberSessionAsync(WatchPageData watchPageData)
         {
             var noMemberJson = JsonSerializer.Serialize(new[] { new NoMemberRequest(watchPageData) });
-            using (var content = new StringContent(noMemberJson, Encoding.UTF8, "application/json"))
-            using (var msg = new HttpRequestMessage(HttpMethod.Post ,$"https://public.api.nicovideo.jp/v1/user/actions/watch-events/nonmember.json?__retry=0"))
-            {
-                msg.Content = content;
-                msg.Headers.Add("X-Frontend-Id","6");
-                msg.Headers.Add("X-Frontend-Version","0");
-                msg.Headers.Add("X-Request-With", $"https://www.nicovideo.jp/watch/{watchPageData.Client.WatchId}");
-                var response = await this._nndClient._client.SendAsync(msg);
-            }
-        }
+			using var content = new StringContent(noMemberJson, Encoding.UTF8, "application/json");
+			using var msg = new HttpRequestMessage(HttpMethod.Post, $"https://public.api.nicovideo.jp/v1/user/actions/watch-events/nonmember.json?__retry=0");
+			msg.Content = content;
+			msg.Headers.Add("X-Frontend-Id", "6");
+			msg.Headers.Add("X-Frontend-Version", "0");
+			msg.Headers.Add("X-Request-With", $"https://www.nicovideo.jp/watch/{watchPageData.Client.WatchId}");
+			var response = await this._nndClient._client.SendAsync(msg);
+		}
 
         /// <summary>
         /// Get a reponse object from the Video API for the HTTP (usually mp4) version of a video
@@ -70,29 +68,25 @@ namespace NicoNicoNii
         /// <returns>SessionCreate Response with video API info about the content</returns>
         public async Task<SessionCreateResponse> GetHTTPVideoApiResponseAsync(WatchPageData watchPageData, string[] audioQualities = null, string[] videoQualities = null)
         {
-            if (videoQualities == null)
-                videoQualities = watchPageData.Media.Delivery.Movie.Session.Videos.ToArray();
-            if (audioQualities == null)
-                audioQualities = watchPageData.Media.Delivery.Movie.Session.Audios.ToArray();
+            videoQualities ??= watchPageData.Media.Delivery.Movie.Session.Videos.ToArray();
+            audioQualities ??= watchPageData.Media.Delivery.Movie.Session.Audios.ToArray();
 
             var loggedIn = false;
-            if (this._nndClient._loginDate != null 
-                && (DateTimeOffset.UtcNow.DateTime - this._nndClient._loginDate?.DateTime)?.Hours < 5)
+            if (this._nndClient.LoginDate != null 
+                && (DateTimeOffset.UtcNow.DateTime - this._nndClient.LoginDate?.DateTime)?.Hours < 5)
             {
                 loggedIn = true;
             }
 
             var json = JsonSerializer.Serialize(new SessionCreateHTTP(watchPageData, audioQualities, videoQualities, loggedIn));
-            using (var content = new StringContent(json, Encoding.UTF8, "application/json"))
-            using (var msg = new HttpRequestMessage(HttpMethod.Post, $"{watchPageData.Media.Delivery.Movie.Session.Urls[0].UrlUrl}?_format=json"))
-            {
-                msg.Content = content;
-                var response = await this._nndClient._client.SendAsync(msg);
-                var responseJson = await response.Content.ReadAsStringAsync();
-                var sessionResponse = JsonSerializer.Deserialize<SessionCreateResponse>(responseJson);
-                return sessionResponse;
-            }
-        }
+			using var content = new StringContent(json, Encoding.UTF8, "application/json");
+			using var msg = new HttpRequestMessage(HttpMethod.Post, $"{watchPageData.Media.Delivery.Movie.Session.Urls[0].UrlUrl}?_format=json");
+			msg.Content = content;
+			var response = await this._nndClient._client.SendAsync(msg);
+			var responseJson = await response.Content.ReadAsStringAsync();
+			var sessionResponse = JsonSerializer.Deserialize<SessionCreateResponse>(responseJson);
+			return sessionResponse;
+		}
 
         /// <summary>
         /// Get a reponse object from the Video API for the HLS (so DASH but video and audio arent seperated I think) version of a video
@@ -103,28 +97,24 @@ namespace NicoNicoNii
         /// <returns>SessionCreate Response with video API info about the content</returns>
         public async Task<SessionCreateResponse> GetHLSVideoApiResponseAsync(WatchPageData watchPageData, string[] audioQualities = null, string[] videoQualities = null)
         {
-            if (videoQualities == null)
-                videoQualities = watchPageData.Media.Delivery.Movie.Session.Videos.ToArray();
-            if (audioQualities == null)
-                audioQualities = watchPageData.Media.Delivery.Movie.Session.Audios.ToArray();
+            videoQualities ??= watchPageData.Media.Delivery.Movie.Session.Videos.ToArray();
+            audioQualities ??= watchPageData.Media.Delivery.Movie.Session.Audios.ToArray();
 
             var loggedIn = false;
-            if (this._nndClient._loginDate != null
-                && (DateTimeOffset.UtcNow.DateTime - this._nndClient._loginDate?.DateTime)?.Hours < 5)
+            if (this._nndClient.LoginDate != null
+                && (DateTimeOffset.UtcNow.DateTime - this._nndClient.LoginDate?.DateTime)?.Hours < 5)
             {
                 loggedIn = true;
             }
 
             var json = JsonSerializer.Serialize(new SessionCreateHLS(watchPageData, audioQualities, videoQualities, loggedIn));
-            using (var content = new StringContent(json, Encoding.UTF8, "application/json"))
-            using (var msg = new HttpRequestMessage(HttpMethod.Post, $"{watchPageData.Media.Delivery.Movie.Session.Urls[0].UrlUrl}?_format=json"))
-            {
-                msg.Content = content;
-                var response = await this._nndClient._client.SendAsync(msg);
-                var responseJson = await response.Content.ReadAsStringAsync();
-                var sessionResponse = JsonSerializer.Deserialize<SessionCreateResponse>(responseJson);
-                return sessionResponse;
-            }
-        }
+			using var content = new StringContent(json, Encoding.UTF8, "application/json");
+			using var msg = new HttpRequestMessage(HttpMethod.Post, $"{watchPageData.Media.Delivery.Movie.Session.Urls[0].UrlUrl}?_format=json");
+			msg.Content = content;
+			var response = await this._nndClient._client.SendAsync(msg);
+			var responseJson = await response.Content.ReadAsStringAsync();
+			var sessionResponse = JsonSerializer.Deserialize<SessionCreateResponse>(responseJson);
+			return sessionResponse;
+		}
     }
 }
